@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { getProductViewModel } from "@/features/product/mappers/product.mapper";
 import { ProductGallery } from "@/features/product/components/product-gallery";
@@ -32,59 +33,61 @@ export function ProductPage({ slug }: ProductPageProps) {
 
   return (
     <main className="min-h-screen bg-[#0A0A0D]">
-      <motion.nav
-        {...motionProps}
-        className="flex items-center gap-2.5 pt-[18px] px-12 text-xs"
-      >
-        <ol className="flex items-center gap-2.5">
-          <li>
-            <a
-              href="/"
-              className="font-medium text-[#AFA7A2] transition-colors hover:text-[#d9afc0]"
-            >
-              Trang chủ
-            </a>
-          </li>
-          <li className="font-medium text-[#756F6A]">/</li>
-          <li>
-            <a
-              href="/nu"
-              className="font-medium text-[#AFA7A2] transition-colors hover:text-[#d9afc0]"
-            >
-              Nữ
-            </a>
-          </li>
-          <li className="font-medium text-[#756F6A]">/</li>
-          <li className="font-semibold text-[#F2E4EA]">
-            Shop / {product.name}
-          </li>
-        </ol>
-      </motion.nav>
+      <div className="mx-auto w-full max-w-[1440px]">
+        <motion.nav
+          {...motionProps}
+          className="flex items-center gap-2.5 px-4 pt-[18px] text-xs md:px-8 xl:px-12"
+        >
+          <ol className="flex flex-wrap items-center gap-2.5">
+            <li>
+              <Link
+                href="/"
+                className="font-medium text-[#AFA7A2] transition-colors hover:text-[#d9afc0]"
+              >
+                Trang chủ
+              </Link>
+            </li>
+            <li className="font-medium text-[#756F6A]">/</li>
+            <li>
+              <Link
+                href="/nu"
+                className="font-medium text-[#AFA7A2] transition-colors hover:text-[#d9afc0]"
+              >
+                Nữ
+              </Link>
+            </li>
+            <li className="font-medium text-[#756F6A]">/</li>
+            <li className="font-semibold text-[#F2E4EA]">
+              Shop / {product.name}
+            </li>
+          </ol>
+        </motion.nav>
 
-      <section className="flex gap-7 px-12 py-6">
-        <motion.div {...motionProps} className="w-[760px] flex-shrink-0">
-          <ProductGallery images={product.images} />
-        </motion.div>
-        <ProductInfo
-          name={product.name}
-          price={product.price}
-          originalPrice={product.originalPrice}
-          description={product.description}
-          colors={product.colors}
-          sizes={product.sizes}
-          accordions={product.accordions}
-          rating={product.rating}
-          reviewCount={product.reviewCount}
+        <section className="flex flex-col items-start gap-7 px-4 py-6 md:px-8 xl:flex-row xl:items-stretch xl:px-12">
+          <motion.div
+            {...motionProps}
+            className="w-full flex-shrink-0 xl:w-[760px]"
+          >
+            <ProductGallery images={product.images} />
+          </motion.div>
+          <ProductInfo
+            name={product.name}
+            price={product.price}
+            description={product.description}
+            colors={product.colors}
+            sizes={product.sizes}
+            accordions={product.accordions}
+            rating={product.rating}
+            reviewCount={product.reviewCount}
+          />
+        </section>
+
+        <ProductUpsell products={product.upsellProducts} />
+
+        <ProductReviews
+          reviews={product.reviews}
         />
-      </section>
-
-      <ProductUpsell products={product.upsellProducts} />
-
-      <ProductReviews
-        reviews={product.reviews}
-        rating={product.rating}
-        reviewCount={product.reviewCount}
-      />
+      </div>
     </main>
   );
 }

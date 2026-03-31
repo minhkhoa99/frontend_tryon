@@ -26,7 +26,10 @@ export function ProductUpsell({ products }: ProductUpsellProps) {
       : ({ initial: false as const } as const);
 
   return (
-    <motion.section {...motionProps} className="px-7 py-16">
+    <motion.section
+      {...motionProps}
+      className="px-4 pb-0 pt-2 md:px-8 xl:px-12"
+    >
       <div className="mb-8 flex flex-col gap-2">
         <h2 className="font-[family-name:var(--font-playfair)] text-[36px] font-bold text-[#fff7f2]">
           Phối cùng AI
@@ -36,7 +39,7 @@ export function ProductUpsell({ products }: ProductUpsellProps) {
         </p>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="grid grid-cols-1 gap-[18px] pb-4 md:grid-cols-3">
         {products.map((product, index) => (
           <motion.div
             key={product.id}
@@ -52,21 +55,21 @@ export function ProductUpsell({ products }: ProductUpsellProps) {
                   },
                 }
               : { initial: false })}
-            className="flex min-w-[220px] flex-col gap-3 rounded-[26px] border border-white/[0.06] bg-[#121219] p-[14px] pb-[18px] md:min-w-[260px]"
+            className="flex w-full flex-col gap-3 rounded-[26px] border border-white/[0.06] bg-[#121219] p-[14px] pb-[18px]"
           >
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[18px] bg-[#121218]">
+            <div className="relative h-[210px] overflow-hidden rounded-[22px] bg-[#121218]">
               <Image
                 src={product.image}
                 alt={product.alt}
                 fill
                 className="object-cover"
-                sizes="(min-width: 768px) 260px, 220px"
+                sizes="(min-width: 768px) 33vw, 100vw"
               />
             </div>
-            <h3 className="text-[14px] font-semibold text-[#fff4ef] md:text-[15px]">
+            <h3 className="text-[18px] font-semibold text-[#fff4ef]">
               {product.name}
             </h3>
-            <p className="font-[family-name:var(--font-mono)] text-[13px] font-semibold text-[#d9afc0] md:text-[14px]">
+            <p className="font-[family-name:var(--font-mono)] text-[13px] font-semibold text-[#d9afc0]">
               {product.price}
             </p>
           </motion.div>

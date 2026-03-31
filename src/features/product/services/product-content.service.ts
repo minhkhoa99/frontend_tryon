@@ -1,6 +1,8 @@
 import type { ProductContent } from "@/features/product/types/product.types";
 
-export function getProductContent(slug: string): ProductContent {
+export function getProductContent(_slug: string): ProductContent {
+  void _slug;
+
   return {
     id: "silk-contour-top",
     name: "Silk Contour Top",
@@ -9,9 +11,10 @@ export function getProductContent(slug: string): ProductContent {
     description:
       "A sculpted silk essential with fluid drape, luminous finish and a silhouette designed to elevate tailored separates.",
     images: [
-      { id: "img-1", url: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80", alt: "Silk Contour Top" },
-      { id: "img-2", url: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80", alt: "Side view" },
-      { id: "img-3", url: "https://images.unsplash.com/photo-1485462537746-965f33f7f6a5?w=800&q=80", alt: "Detail" },
+      { id: "img-1", url: "/images/product-detail/hero.png", alt: "Silk Contour Top" },
+      { id: "img-2", url: "/images/product-detail/thumb-1.png", alt: "Silk Contour Top side view" },
+      { id: "img-3", url: "/images/product-detail/thumb-2.png", alt: "Silk Contour Top detail" },
+      { id: "img-4", url: "/images/product-detail/thumb-3.png", alt: "Silk Contour Top alternate look" },
     ],
     colors: [
       { id: "rose", name: "Rose", hex: "#F2D2DB", inStock: true },
@@ -42,21 +45,21 @@ export function getProductContent(slug: string): ProductContent {
         id: "noir-pants",
         name: "Noir Tapered Pants",
         price: "2.150.000đ",
-        image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80",
+        image: "/images/product-detail/upsell-pants.png",
         alt: "Noir Tapered Pants",
       },
       {
         id: "blush-heels",
         name: "Blush Point Heels",
         price: "1.890.000đ",
-        image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60905?w=400&q=80",
+        image: "/images/product-detail/upsell-heels.png",
         alt: "Blush Point Heels",
       },
       {
         id: "mini-bag",
         name: "Mini Sculpt Bag",
         price: "2.790.000đ",
-        image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400&q=80",
+        image: "/images/product-detail/upsell-bag.png",
         alt: "Mini Sculpt Bag",
       },
     ],

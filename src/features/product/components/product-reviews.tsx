@@ -6,8 +6,6 @@ import type { Review } from "@/features/product/types/product.types";
 
 type ProductReviewsProps = {
   reviews: Review[];
-  rating: number;
-  reviewCount: number;
 };
 
 function StarRating({ rating }: { rating: number }) {
@@ -30,7 +28,7 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export function ProductReviews({ reviews, rating, reviewCount }: ProductReviewsProps) {
+export function ProductReviews({ reviews }: ProductReviewsProps) {
   const shouldReduceMotion = useReducedMotion();
   const reveal = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 18 },
