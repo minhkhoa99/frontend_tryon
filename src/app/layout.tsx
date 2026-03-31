@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { SharedHeader } from "@/shared/components/layout/shared-header";
+import { SharedFooter } from "@/shared/components/layout/shared-footer";
+import { getHomeViewModel } from "@/features/home/mappers/home.mapper";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -32,10 +35,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const viewModel = getHomeViewModel();
+
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} ${plexMono.variable}`} suppressHydrationWarning>
+        <SharedHeader navItems={viewModel.navItems} />
         {children}
+        <SharedFooter groups={viewModel.footerGroups} />
       </body>
     </html>
   );
