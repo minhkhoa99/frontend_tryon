@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/shared/lib/cn";
 import { getCatalogContent } from "@/features/catalog/services/catalog-content.service";
@@ -129,12 +130,12 @@ export function CatalogPage() {
                 <div key={column.id} className="flex flex-col gap-[18px]">
                   {column.products.map((product) => (
                     <div key={product.id} className="flex flex-col gap-3">
-                      <div className="relative overflow-hidden rounded-[26px]" style={{ height: product.imageHeight }}>
+                      <Link href={`/products/${product.id}`} className="relative block overflow-hidden rounded-[26px]" style={{ height: product.imageHeight }}>
                         <Image src={product.image} alt={product.name} fill className="object-cover" sizes="(min-width: 768px) 33vw, 100vw" />
-                      </div>
-                      <h2 className="font-[family-name:var(--font-playfair)] text-[24px] font-bold leading-[1.08] text-[#2B1E26]">
+                      </Link>
+                      <Link href={`/products/${product.id}`} className="font-[family-name:var(--font-playfair)] text-[24px] font-bold leading-[1.08] text-[#2B1E26] hover:text-[#8C5F72]">
                         {product.name}
-                      </h2>
+                      </Link>
                       <p className="text-[14px] font-semibold text-[#6F6560]">{product.price}</p>
                     </div>
                   ))}

@@ -3,14 +3,14 @@ import type { HomeContent } from "@/features/home/types/home.types";
 export function getHomeContent(): HomeContent {
   return {
     navItems: [
-      { label: "Cửa hàng", href: "#categories" },
-      { label: "Khu vực thử đồ", href: "#demo" },
-      { label: "Xu hướng", href: "#trending" },
-      { label: "Trợ lý phối đồ", href: "#chat-stylist" },
+      { label: "Cửa hàng", href: "/products" },
+      { label: "Khu vực thử đồ", href: "/try-on" },
+      { label: "Wishlist", href: "/wishlist" },
+      { label: "Trợ lý phối đồ", href: "/chatbot" },
     ],
     heroActions: [
-      { label: "Trải nghiệm Thử Đồ AI", href: "#demo", variant: "primary" },
-      { label: "Khám phá bộ sưu tập", href: "#categories", variant: "secondary" },
+      { label: "Trải nghiệm Thử Đồ AI", href: "/try-on", variant: "primary" },
+      { label: "Khám phá bộ sưu tập", href: "/products", variant: "secondary" },
     ],
     howSteps: [
       {
@@ -93,27 +93,27 @@ export function getHomeContent(): HomeContent {
         id: "shop",
         title: "Shop",
         links: [
-          { id: "shop-new-arrivals", label: "New arrivals", href: "#trending" },
-          { id: "shop-trending", label: "Trending", href: "#trending" },
-          { id: "shop-collections", label: "Collections", href: "#categories" },
+          { id: "shop-new-arrivals", label: "New arrivals", href: "/products" },
+          { id: "shop-trending", label: "Trending", href: "/products" },
+          { id: "shop-collections", label: "Collections", href: "/products" },
         ],
       },
       {
         id: "support",
         title: "Support",
         links: [
-          { id: "support-size-guide", label: "Size guide", href: "#how-it-works" },
-          { id: "support-shipping", label: "Shipping", href: "#how-it-works" },
-          { id: "support-returns", label: "Returns", href: "#how-it-works" },
+          { id: "support-size-guide", label: "Size guide", href: "/policies" },
+          { id: "support-shipping", label: "Shipping", href: "/policies" },
+          { id: "support-returns", label: "Returns", href: "/policies" },
         ],
       },
       {
         id: "company",
         title: "Company",
         links: [
-          { id: "company-about", label: "About", href: "#top" },
-          { id: "company-privacy", label: "Privacy", href: "#subscribe" },
-          { id: "company-contact", label: "Contact", href: "#chat-stylist" },
+          { id: "company-about", label: "About", href: "/about" },
+          { id: "company-privacy", label: "Privacy", href: "/policies" },
+          { id: "company-contact", label: "Contact", href: "/contact" },
         ],
       },
     ],

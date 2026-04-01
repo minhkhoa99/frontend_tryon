@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { getCartDrawerContent } from "@/features/cart/services/cart-content.service";
+import { getCartPageContent } from "@/features/cart/services/cart-content.service";
+import { useCartProducts } from "@/features/cart/hooks/use-cart-products";
+import { useCartStore } from "@/features/cart/store/cart-store";
 
 function CartPageBreadcrumb({ items }: { items: string[] }) {
   return (
@@ -20,7 +22,10 @@ function CartPageBreadcrumb({ items }: { items: string[] }) {
 }
 
 export function CartPage() {
-  const content = getCartDrawerContent();
+  const content = getCartPageContent();
+  const { items, subtotalLabel } = useCartProducts();
+  const removeItem = useCartStore((state) => state.removeItem);
+  const setQuantity = useCartStore((state) => state.setQuantity);
   const shouldReduceMotion = useReducedMotion();
   const reveal = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 18 },
@@ -58,19 +63,19 @@ export function CartPage() {
               </div>
             </div>
 
-            {content.items.map((item) => (
-              <div key={item.id} className="flex gap-[14px] rounded-[24px] border border-white/[0.06] bg-[#17161D] p-[14px]">
+            {items.map((item) => (
+              <div key={item.product.id} className="flex gap-[14px] rounded-[24px] border border-white/[0.06] bg-[#17161D] p-[14px]">
                 <div className="relative h-[120px] w-[104px] flex-none overflow-hidden rounded-[18px] bg-[#221f28]">
-                  <Image src={item.image} alt={item.name} fill className="object-cover" sizes="104px" />
+                  <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="104px" />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
-                  <p className="text-[18px] font-semibold text-[#FFF4EF]">{item.name}</p>
-                  <p className="text-[13px] font-medium text-[#BEB5B0]">{item.meta} - {item.price}</p>
-                  <button type="button" className="w-fit text-[13px] font-semibold text-[#E4B8C8]">Xóa</button>
+                  <p className="text-[18px] font-semibold text-[#FFF4EF]">{item.product.name}</p>
+                  <p className="text-[13px] font-medium text-[#BEB5B0]">{item.product.cartMeta} - {item.product.price}</p>
+                  <button type="button" onClick={() => removeItem(item.product.id)} className="w-fit text-[13px] font-semibold text-[#E4B8C8]">Xóa</button>
                   <div className="flex items-center gap-2 pt-1">
-                    <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.05] font-[family-name:var(--font-mono)] text-[14px] font-semibold text-[#F4ECE7]">-</span>
+                    <button type="button" onClick={() => setQuantity(item.product.id, item.quantity - 1)} className="flex h-[30px] w-[30px] items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.05] font-[family-name:var(--font-mono)] text-[14px] font-semibold text-[#F4ECE7]">-</button>
                     <span className="font-[family-name:var(--font-mono)] text-[13px] font-bold text-[#FFF4EF]">{item.quantity}</span>
-                    <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.05] font-[family-name:var(--font-mono)] text-[14px] font-semibold text-[#F4ECE7]">+</span>
+                    <button type="button" onClick={() => setQuantity(item.product.id, item.quantity + 1)} className="flex h-[30px] w-[30px] items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.05] font-[family-name:var(--font-mono)] text-[14px] font-semibold text-[#F4ECE7]">+</button>
                   </div>
                 </div>
               </div>
@@ -81,7 +86,7 @@ export function CartPage() {
             <div className="flex flex-col gap-[14px] rounded-[30px] border border-white/[0.08] bg-[#13131ACC] p-5 backdrop-blur-[18px]">
               <h2 className="font-[family-name:var(--font-playfair)] text-[32px] font-bold text-[#FFF7F2]">Tóm tắt đơn hàng</h2>
               <p className="font-[family-name:var(--font-mono)] text-[14px] font-semibold text-[#F4ECE7]">
-                {content.subtotalLabel}: {content.subtotalValue}
+                {content.subtotalLabel}: {subtotalLabel}
               </p>
               <p className="text-[13px] font-semibold text-[#BEB5B0]">{content.orderNoteLabel}</p>
               <div className="h-24 rounded-[20px] border border-white/[0.07] bg-white/[0.05]" />

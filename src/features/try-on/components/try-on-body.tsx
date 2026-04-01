@@ -40,7 +40,7 @@ export function TryOnBody({ content }: TryOnBodyProps) {
           <motion.div {...motionProps}>
             <SwatchPanel swatches={content.swatches} sizes={content.sizes} />
           </motion.div>
-          <ActionsRow />
+          <ActionsRow productId={content.product.id} />
           <motion.div {...motionProps}>
             <StyleRail pairings={content.pairings} />
           </motion.div>

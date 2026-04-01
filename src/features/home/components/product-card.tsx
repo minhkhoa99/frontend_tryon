@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import type { TrendingProduct } from "@/features/home/types/home.types";
 
 type ProductCardProps = {
@@ -29,7 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {...motionProps}
       className="flex flex-col gap-[14px] rounded-[28px] border border-white/8 bg-[#121219] p-[18px] pb-[22px]"
     >
-      <div className="relative aspect-[1/1] overflow-hidden rounded-[22px] md:aspect-[0.95/1]">
+      <Link href={`/products/${product.id}`} className="relative block aspect-[1/1] overflow-hidden rounded-[22px] md:aspect-[0.95/1]">
         <Image
           src={product.image}
           alt={product.alt}
@@ -37,8 +38,10 @@ export function ProductCard({ product }: ProductCardProps) {
           sizes="(min-width: 1280px) 417px, (min-width: 1024px) calc((100vw - 164px) / 3), (min-width: 768px) calc(100vw - 64px), calc(100vw - 32px)"
           className="object-cover"
         />
-      </div>
-      <h3 className="text-xl font-semibold text-[#fff4ef]">{product.name}</h3>
+      </Link>
+      <Link href={`/products/${product.id}`} className="text-xl font-semibold text-[#fff4ef] hover:text-white">
+        {product.name}
+      </Link>
       <p className="font-[family-name:var(--font-mono)] text-sm font-semibold text-[#d9afc0]">
         {product.price}
       </p>

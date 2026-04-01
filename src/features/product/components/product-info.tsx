@@ -1,8 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/shared/lib/cn";
+import { useCartStore } from "@/features/cart/store/cart-store";
+import { getCommerceProductById } from "@/features/cart/services/commerce-products.service";
+import { useToastStore } from "@/shared/store/toast-store";
 import type {
   ProductColor,
   ProductSize,
@@ -10,6 +14,7 @@ import type {
 } from "@/features/product/types/product.types";
 
 type ProductInfoProps = {
+  productId: string;
   name: string;
   price: string;
   description: string;
@@ -21,6 +26,7 @@ type ProductInfoProps = {
 };
 
 export function ProductInfo({
+  productId,
   name,
   price,
   description,
@@ -30,6 +36,8 @@ export function ProductInfo({
   rating,
   reviewCount,
 }: ProductInfoProps) {
+  const addItem = useCartStore((state) => state.addItem);
+  const showToast = useToastStore((state) => state.showToast);
   const [selectedColor, setSelectedColor] = useState(
     colors.find((c) => c.inStock)?.id ?? colors[0]?.id,
   );
@@ -143,25 +151,42 @@ export function ProductInfo({
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
             <span className="text-[13px] font-medium text-[#beb5b0]">Size guide available</span>
-            <button
-              type="button"
+            <Link
+              href="/chatbot"
               className="text-[13px] font-semibold text-[#f1c6d4]"
             >
               Open size chatbot
-            </button>
+            </Link>
           </div>
         </motion.div>
 
         <motion.div {...motionProps} className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            className="flex-1 rounded-full bg-gradient-to-r from-[#f6d2db] to-[#d89aae] px-6 py-4 text-[15px] font-bold text-[#140e12] transition-all hover:opacity-90 active:scale-[0.98]"
+          <Link
+            href="/try-on"
+            className="flex-1 rounded-full bg-gradient-to-r from-[#f6d2db] to-[#d89aae] px-6 py-4 text-center text-[15px] font-bold text-[#140e12] transition-all hover:opacity-90 active:scale-[0.98]"
           >
             Thử áo này bằng AI
-          </button>
+          </Link>
           <button
             type="button"
-            className="flex-1 rounded-full bg-white/[0.047] px-6 py-4 text-[15px] font-bold text-[#f4ece7] ring-1 ring-white/[0.086] transition-all hover:bg-white/[0.06] active:scale-[0.98]"
+            onClick={() => {
+              const product = getCommerceProductById(productId);
+              if (!product) {
+                showToast({
+                  title: "Không thể thêm vào giỏ",
+                  description: "Sản phẩm hiện không khả dụng. Vui lòng thử lại.",
+                  tone: "error",
+                });
+                return;
+              }
+              addItem(productId);
+              showToast({
+                title: "Đã thêm vào giỏ hàng",
+                description: `${product.name} đã được thêm vào giỏ của bạn.`,
+                tone: "success",
+              });
+            }}
+            className="flex-1 rounded-full bg-white/[0.047] px-6 py-4 text-center text-[15px] font-bold text-[#f4ece7] ring-1 ring-white/[0.086] transition-all hover:bg-white/[0.06] active:scale-[0.98]"
           >
             Thêm vào giỏ
           </button>

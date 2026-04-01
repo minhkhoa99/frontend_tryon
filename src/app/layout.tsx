@@ -3,6 +3,7 @@ import { Inter, IBM_Plex_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { SharedHeader } from "@/shared/components/layout/shared-header";
 import { SharedFooter } from "@/shared/components/layout/shared-footer";
+import { ToastViewport } from "@/shared/components/ui/toast-viewport";
 import { getHomeViewModel } from "@/features/home/mappers/home.mapper";
 
 const inter = Inter({
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SharedHeader navItems={viewModel.navItems} />
         {children}
         <SharedFooter groups={viewModel.footerGroups} />
+        <ToastViewport />
       </body>
     </html>
   );

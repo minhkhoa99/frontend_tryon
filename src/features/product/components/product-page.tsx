@@ -50,7 +50,7 @@ export function ProductPage({ slug }: ProductPageProps) {
             <li className="font-medium text-[#756F6A]">/</li>
             <li>
               <Link
-                href="/nu"
+                href="/products"
                 className="font-medium text-[#AFA7A2] transition-colors hover:text-[#d9afc0]"
               >
                 Nữ
@@ -71,6 +71,7 @@ export function ProductPage({ slug }: ProductPageProps) {
             <ProductGallery images={product.images} />
           </motion.div>
           <ProductInfo
+            productId={product.id}
             name={product.name}
             price={product.price}
             description={product.description}

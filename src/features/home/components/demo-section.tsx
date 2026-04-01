@@ -16,7 +16,7 @@ export function DemoSection() {
               </p>
               <div>
                 <Link
-                  href="#chat-stylist"
+                  href="/try-on"
                   className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-3 text-sm font-semibold text-[#f4ece7] backdrop-blur-md transition duration-300 hover:bg-white/10"
                 >
                   Thử lên ảnh của bạn

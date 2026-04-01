@@ -1,21 +1,16 @@
 import type { ProductContent } from "@/features/product/types/product.types";
+import { getCommerceProductBySlug } from "@/features/cart/services/commerce-products.service";
 
-export function getProductContent(_slug: string): ProductContent {
-  void _slug;
+export function getProductContent(slug: string): ProductContent {
+  const product = getCommerceProductBySlug(slug);
 
   return {
-    id: "silk-contour-top",
-    name: "Silk Contour Top",
-    price: "3.490.000đ",
+    id: product.id,
+    name: product.name,
+    price: product.price,
     originalPrice: undefined,
-    description:
-      "A sculpted silk essential with fluid drape, luminous finish and a silhouette designed to elevate tailored separates.",
-    images: [
-      { id: "img-1", url: "/images/product-detail/hero.png", alt: "Silk Contour Top" },
-      { id: "img-2", url: "/images/product-detail/thumb-1.png", alt: "Silk Contour Top side view" },
-      { id: "img-3", url: "/images/product-detail/thumb-2.png", alt: "Silk Contour Top detail" },
-      { id: "img-4", url: "/images/product-detail/thumb-3.png", alt: "Silk Contour Top alternate look" },
-    ],
+    description: product.description,
+    images: product.gallery.map((image, index) => ({ id: `img-${index + 1}`, url: image, alt: product.name })),
     colors: [
       { id: "rose", name: "Rose", hex: "#F2D2DB", inStock: true },
       { id: "noir", name: "Noir", hex: "#111319", inStock: true },

@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import Link from "next/link";
-import { Bell, Menu, User } from "lucide-react";
+import { Bell, Menu, ShoppingBag, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { NavItem } from "@/features/home/types/home.types";
 import { SiteShell } from "@/shared/components/layout/site-shell";
@@ -51,10 +51,13 @@ export function SharedHeader({ navItems }: SharedHeaderProps) {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <Link href="#trending" className={iconLinkClassName} aria-label="Xu hướng">
+            <Link href="/notifications" className={iconLinkClassName} aria-label="Thông báo và cập nhật hệ thống">
               <Bell size={18} />
             </Link>
-            <Link href="#chat-stylist" className={iconLinkClassName} aria-label="Tài khoản và hỗ trợ">
+            <Link href="/cart" className={iconLinkClassName} aria-label="Giỏ hàng của tôi">
+              <ShoppingBag size={18} />
+            </Link>
+            <Link href="/auth/login" className={iconLinkClassName} aria-label="Tài khoản và hỗ trợ">
               <User size={18} />
             </Link>
             <Link href="/try-on" className={headerCtaClassName}>
@@ -97,10 +100,13 @@ export function SharedHeader({ navItems }: SharedHeaderProps) {
               </Link>
             ))}
             <div className="flex items-center gap-3 pt-1">
-              <Link href="#trending" className={iconLinkClassName} aria-label="Xu hướng">
+              <Link href="/notifications" className={iconLinkClassName} aria-label="Thông báo và cập nhật hệ thống">
                 <Bell size={18} />
               </Link>
-              <Link href="#chat-stylist" className={iconLinkClassName} aria-label="Tài khoản và hỗ trợ">
+              <Link href="/cart" className={iconLinkClassName} aria-label="Giỏ hàng của tôi">
+                <ShoppingBag size={18} />
+              </Link>
+              <Link href="/auth/login" className={iconLinkClassName} aria-label="Tài khoản và hỗ trợ">
                 <User size={18} />
               </Link>
             </div>

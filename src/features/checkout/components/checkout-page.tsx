@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { CheckoutBreadcrumb } from "@/features/checkout/components/checkout-breadcrumb";
 import { CheckoutFormCard } from "@/features/checkout/components/checkout-form-card";
 import { CheckoutSummaryCard } from "@/features/checkout/components/checkout-summary-card";
@@ -10,10 +11,12 @@ import type { CheckoutSchema } from "@/features/checkout/schemas/checkout.schema
 export function CheckoutPage() {
   const content = getCheckoutContent();
   const form = useCheckoutForm(content.defaultValues);
+  const router = useRouter();
 
   const handleSubmit = async (_values: CheckoutSchema) => {
     void _values;
     await new Promise((resolve) => setTimeout(resolve, 200));
+    router.push("/checkout/success");
   };
 
   return (

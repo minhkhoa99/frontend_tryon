@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/shared/lib/cn";
 import type { CheckoutContent } from "@/features/checkout/types/checkout.types";
+import { useCartProducts } from "@/features/cart/hooks/use-cart-products";
 
 type CheckoutSummaryCardProps = {
   content: CheckoutContent;
@@ -12,6 +13,7 @@ type CheckoutSummaryCardProps = {
 
 export function CheckoutSummaryCard({ content }: CheckoutSummaryCardProps) {
   const [promoCode, setPromoCode] = useState(content.promoCode);
+  const { items, subtotalLabel } = useCartProducts();
   const shouldReduceMotion = useReducedMotion();
   const reveal = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 18 },
@@ -43,15 +45,15 @@ export function CheckoutSummaryCard({ content }: CheckoutSummaryCardProps) {
           {content.summaryTitle}
         </h2>
 
-        {content.summaryItems.map((item) => (
-          <div key={item.id} className="flex gap-[14px] rounded-[22px] border border-white/[0.06] bg-[#17161D] p-[14px]">
+        {items.map((item) => (
+          <div key={item.product.id} className="flex gap-[14px] rounded-[22px] border border-white/[0.06] bg-[#17161D] p-[14px]">
             <div className="relative h-24 w-[84px] overflow-hidden rounded-2xl bg-[#221f28]">
-              <Image src={item.image} alt={item.name} fill className="object-cover" sizes="84px" />
+              <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="84px" />
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <p className="text-[16px] font-semibold text-[#FFF4EF]">{item.name}</p>
-              <p className="text-[13px] font-medium text-[#BEB5B0]">{item.meta}</p>
-              <p className="font-[family-name:var(--font-mono)] text-[13px] font-bold text-[#E5B6C7]">{item.price}</p>
+              <p className="text-[16px] font-semibold text-[#FFF4EF]">{item.product.name}</p>
+              <p className="text-[13px] font-medium text-[#BEB5B0]">{item.product.cartMeta}</p>
+              <p className="font-[family-name:var(--font-mono)] text-[13px] font-bold text-[#E5B6C7]">{item.product.price}</p>
             </div>
           </div>
         ))}
@@ -84,7 +86,7 @@ export function CheckoutSummaryCard({ content }: CheckoutSummaryCardProps) {
                   line.tone === "positive" ? "text-[#D8ECCA]" : "text-[#F4ECE7]",
                 )}
               >
-                {line.value}
+                {line.id === "subtotal" ? subtotalLabel : line.value}
               </span>
             </div>
           ))}
