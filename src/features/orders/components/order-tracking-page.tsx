@@ -78,17 +78,39 @@ export function OrderTrackingPage() {
               </h1>
               <p className="text-[15px] font-medium text-[#CEC6C1]">{content.statusLine}</p>
 
-              <div className="grid grid-cols-1 gap-[14px] md:grid-cols-4">
-                {content.statusSteps.map((step) => (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4 md:gap-[14px]">
+                {content.statusSteps.map((step, index) => (
                   <div key={step.id} className="flex flex-col items-center gap-2 text-center">
-                    <span
-                      className={cn(
-                        "h-[18px] w-[18px] rounded-full",
-                        step.state === "current" && "bg-[#F6D2DB] shadow-[0_0_12px_rgba(241,198,212,0.55)]",
-                        step.state === "done" && "bg-[#D89AAE]",
-                        step.state === "upcoming" && "bg-[#4B4B55]",
+                    <div className="flex w-full items-center justify-center gap-2 md:gap-3">
+                      {index > 0 ? (
+                        <span
+                          className={cn(
+                            "hidden h-px flex-1 md:block",
+                            step.state === "upcoming" ? "bg-[#34343c]" : "bg-[#D89AAE]",
+                          )}
+                        />
+                      ) : (
+                        <span className="hidden flex-1 md:block" />
                       )}
-                    />
+                      <span
+                        className={cn(
+                          "h-[18px] w-[18px] rounded-full flex-none",
+                          step.state === "current" && "bg-[#F6D2DB] shadow-[0_0_12px_rgba(241,198,212,0.55)]",
+                          step.state === "done" && "bg-[#D89AAE]",
+                          step.state === "upcoming" && "bg-[#4B4B55]",
+                        )}
+                      />
+                      {index < content.statusSteps.length - 1 ? (
+                        <span
+                          className={cn(
+                            "hidden h-px flex-1 md:block",
+                            step.state === "upcoming" ? "bg-[#34343c]" : "bg-[#D89AAE]",
+                          )}
+                        />
+                      ) : (
+                        <span className="hidden flex-1 md:block" />
+                      )}
+                    </div>
                     <span
                       className={cn(
                         "text-[12px] font-semibold",
@@ -101,7 +123,7 @@ export function OrderTrackingPage() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-center gap-[14px]">
+              <div className="flex flex-wrap items-center gap-[14px] pt-1">
                 {content.actions.map((action) => (
                   <Link
                     key={action.id}
@@ -141,7 +163,7 @@ export function OrderTrackingPage() {
 
             <motion.section {...motionProps} className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {content.helpCards.map((card) => (
-                <div key={card.id} className="flex flex-col gap-1.5 rounded-[24px] border border-white/[0.07] bg-[#121218CC] p-4">
+                <div key={card.id} className="flex flex-col gap-1.5 rounded-[24px] border border-white/[0.07] bg-[#121218CC] p-4 backdrop-blur-[12px]">
                   <span className="font-[family-name:var(--font-mono)] text-[11px] font-semibold text-[#E4B8C8]">
                     {card.label}
                   </span>
