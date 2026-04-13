@@ -11,7 +11,7 @@
 Frontend (`frontend_tryon`) xác thực người dùng thông qua chuỗi:
 
 ```
-Browser → Next.js Route Handler → API Gateway (:8080) → auth_service_tryon
+Browser → Next.js Route Handler → API Gateway (:4001) → auth_service_tryon
 ```
 
 Token được lưu trong **HttpOnly Cookie** — không bao giờ lộ ra JavaScript phía browser.  
@@ -46,19 +46,21 @@ Mọi HTTP call từ browser đều dùng **`fetch` thuần** — không dùng a
                    │ fetch + Authorization: Bearer <access_token>
                    ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                  API Gateway (:8080)                          │
-│  /auth/**  → identity-service  (NO JWT required)             │
-│  /orders/** → commerce-service (JWT required)                 │
-│  /cart/**  → cart-service      (JWT required)                 │
+│                  API Gateway (:4001)                          │
+│  /api/v1/login         → identity-service (NO JWT)           │
+│  /api/v1/token/refresh → identity-service (NO JWT)           │
+│  /api/v1/logout        → identity-service (JWT required)     │
+│  /api/v1/orders/*      → commerce-service (JWT required)     │
+│  /api/v1/cart/*        → cart-service     (JWT required)     │
 │  ...                                                          │
 └──────────────────┬───────────────────────────────────────────┘
                    │
                    ▼
 ┌──────────────────────────────────────────────────────────────┐
-│              auth_service_tryon (identity-service)           │
-│  POST /api/v2/login                                          │
-│  POST /api/v2/token/refresh                                  │
-│  POST /api/v2/logout                                         │
+│              auth_service_tryon (identity-service :8080)     │
+│  POST /api/v1/login                                          │
+│  POST /api/v1/token/refresh                                  │
+│  POST /api/v1/logout                                         │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -82,7 +84,7 @@ Browser                    Next.js Route Handler           API Gateway → auth_
    │                              │                              │
    │-- POST /api/auth/login ----→│                              │
    │   { phone, password }        │                              │
-   │                              │-- POST /gateway/auth/api/v2/login
+   │                              │-- POST ${GATEWAY_URL}/api/v1/login
    │                              │   { username: phone,         │
    │                              │     password,                │
    │                              │     metadata: {              │
@@ -135,7 +137,7 @@ Browser                    Next.js Route Handler           API Gateway
    │                              │                              │
    │-- POST /api/auth/logout ---→│                              │
    │   (cả 2 cookies tự gắn)     │                              │
-   │                              │-- POST /gateway/auth/api/v2/logout
+   │                              │-- POST ${GATEWAY_URL}/api/v1/logout
    │                              │   Authorization: Bearer <at> │
    │                              │   body: { refresh_token }    │
    │                              │←── 200 OK                   │
@@ -352,7 +354,7 @@ export function useAuth() {
 
 ```env
 # .env.local (server-side only — không prefix NEXT_PUBLIC_)
-GATEWAY_URL=http://localhost:8080
+GATEWAY_URL=http://localhost:4001
 ```
 
 > Browser không bao giờ biết `GATEWAY_URL`. Mọi request từ browser đều đến `/api/auth/*` của Next.js.
