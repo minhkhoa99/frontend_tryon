@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -9,28 +9,28 @@ import {
   type ForgotPasswordSchema,
   type LoginSchema,
   type RegisterSchema,
-} from "@/features/auth/schemas/auth.schema";
+} from '@/features/auth/schemas/auth.schema'
 
 export function useLoginForm() {
   return useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "your@email.com", password: "password" },
-    mode: "onBlur",
-  });
+    defaultValues: { phone: '', password: '' },
+    mode: 'onBlur',
+  })
 }
 
 export function useRegisterForm() {
   return useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { fullName: "Nguyen Van A", email: "your@email.com", password: "password", agree: true },
-    mode: "onBlur",
-  });
+    defaultValues: { fullName: '', phone: '', password: '', agree: true },
+    mode: 'onBlur',
+  })
 }
 
 export function useForgotPasswordForm() {
   return useForm<ForgotPasswordSchema>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: "your@email.com" },
-    mode: "onBlur",
-  });
+    defaultValues: { phone: '' },
+    mode: 'onBlur',
+  })
 }
