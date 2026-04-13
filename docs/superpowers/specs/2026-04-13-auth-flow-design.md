@@ -80,41 +80,48 @@ Mọi HTTP call từ browser đều dùng **`fetch` thuần** — không dùng a
 ### 3.1 Login
 
 ```
-Browser                    Next.js Route Handler           API Gateway → auth_service
-   │                              │                              │
-   │-- POST /api/auth/login ----→│                              │
-   │   { phone, password }        │                              │
-   │                              │-- POST ${GATEWAY_URL}/api/v1/login
-   │                              │   { username: phone,         │
-   │                              │     password,                │
-   │                              │     metadata: {              │
-   │                              │       device_id: uuid(),     │  ← fresh per login
-   │                              │       device_os: "web",      │
-   │                              │       device_name: "Browser",│
-   │                              │       os_version: "web",     │
-   │                              │       app_version: "1.0.0" }}│
-   │                              │←── { access_token,           │
-   │                              │      refresh_token,          │
-   │                              │      user_id, uuid }         │
-   │                              │                              │
-   │                              │ Set-Cookie: access_token     │
-   │                              │ Set-Cookie: refresh_token    │
-   │←── 200 { user_id, uuid } ───│                              │
-   │    (token KHÔNG trả về body) │                              │
+Browser              Next.js Route Handler      API Gateway (:4001)      auth_service (:8080)
+   │                         │                          │                         │
+   │─ POST /api/auth/login ─→│                          │                         │
+   │  { phone, password }    │                          │                         │
+   │                         │─ POST /api/v1/login ────→│                         │
+   │                         │  { username: phone,      │                         │
+   │                         │    password,             │                         │
+   │                         │    metadata: {           │                         │
+   │                         │      device_id: uuid(),  │  ← fresh per login      │
+   │                         │      device_os: "web",   │                         │
+   │                         │      device_name: "Browser"                        │
+   │                         │      os_version: "web",  │                         │
+   │                         │      app_version:"1.0.0"}│                         │
+   │                         │                          │─ POST /api/v1/login ───→│
+   │                         │                          │  (forward nguyên path)  │
+   │                         │                          │←── { access_token,      │
+   │                         │                          │     refresh_token,      │
+   │                         │                          │     user_id, uuid }     │
+   │                         │←── { access_token, ... }─│                         │
+   │                         │                          │                         │
+   │                         │ Set-Cookie: access_token │                         │
+   │                         │ Set-Cookie: refresh_token│                         │
+   │←─ 200 { user_id, uuid }─│                          │                         │
+   │   (token KHÔNG về body) │                          │                         │
 ```
 
 ### 3.2 Gọi API protected
 
 ```
-Browser                    Next.js Route Handler           API Gateway
-   │                              │                              │
-   │-- GET /api/orders ----------→│                              │
-   │   (cookie tự gắn)            │                              │
-   │                              │ Đọc access_token từ cookie() │
-   │                              │-- GET /gateway/orders -----→│
-   │                              │   Authorization: Bearer <at> │
-   │                              │←── order data               │
-   │←── order data ──────────────│                              │
+Browser              Next.js Route Handler      API Gateway (:4001)      upstream-service
+   │                         │                          │                         │
+   │─ GET /api/orders ──────→│                          │                         │
+   │  (cookie tự gắn)        │                          │                         │
+   │                         │ Đọc access_token cookie  │                         │
+   │                         │─ GET /api/v1/orders ────→│                         │
+   │                         │  Authorization: Bearer   │                         │
+   │                         │                          │ verify JWT (RS256)       │
+   │                         │                          │─ GET /api/v1/orders ───→│
+   │                         │                          │  X-User-ID, X-User-UUID │
+   │                         │                          │←── order data ──────────│
+   │                         │←── order data ───────────│                         │
+   │←─ order data ───────────│                          │                         │
 ```
 
 ### 3.3 Silent Refresh
@@ -122,28 +129,48 @@ Browser                    Next.js Route Handler           API Gateway
 Xảy ra **trong Route Handler** (server-side) — browser hoàn toàn transparent:
 
 ```
-Route Handler → fetch Gateway → 401 "token is expired"
-    ↓
-Route Handler gọi POST /api/auth/refresh (nội bộ)
-    ↓
-    ├── Thành công → rotate cả 2 cookies → retry request gốc
-    └── Thất bại   → xóa cả 2 cookies → return 401 → browser redirect /auth/login
+Browser              Next.js Route Handler      API Gateway (:4001)      auth_service (:8080)
+   │                         │                          │                         │
+   │─ GET /api/orders ──────→│                          │                         │
+   │                         │─ GET /api/v1/orders ────→│                         │
+   │                         │                          │─ 401 token is expired ──│
+   │                         │←── 401 "token is expired"│                         │
+   │                         │                          │                         │
+   │                         │ (silent refresh)         │                         │
+   │                         │─ POST /api/v1/token/refresh ────────────────────→ │
+   │                         │   { refresh_token }      │                         │
+   │                         │←── { access_token mới, refresh_token mới } ──────│
+   │                         │ rotate cả 2 cookies      │                         │
+   │                         │                          │                         │
+   │                         │─ retry GET /api/v1/orders ────────────────────────→
+   │                         │←── order data ───────────────────────────────────│
+   │←─ order data ───────────│                          │                         │
+   │                         │                          │                         │
+   │              (nếu refresh thất bại)                │                         │
+   │                         │ xóa cả 2 cookies         │                         │
+   │←─ 401 ──────────────────│                          │                         │
+   │ redirect /auth/login    │                          │                         │
 ```
 
 ### 3.4 Logout
 
 ```
-Browser                    Next.js Route Handler           API Gateway
-   │                              │                              │
-   │-- POST /api/auth/logout ---→│                              │
-   │   (cả 2 cookies tự gắn)     │                              │
-   │                              │-- POST ${GATEWAY_URL}/api/v1/logout
-   │                              │   Authorization: Bearer <at> │
-   │                              │   body: { refresh_token }    │
-   │                              │←── 200 OK                   │
-   │                              │ Clear cả 2 cookies           │
-   │←── 200 OK ──────────────────│                              │
-   │ redirect → /auth/login       │                              │
+Browser              Next.js Route Handler      API Gateway (:4001)      auth_service (:8080)
+   │                         │                          │                         │
+   │─ POST /api/auth/logout ─→│                         │                         │
+   │  (cả 2 cookies tự gắn)  │                          │                         │
+   │                         │─ POST /api/v1/logout ───→│                         │
+   │                         │  Authorization: Bearer   │                         │
+   │                         │  body:{refresh_token}    │                         │
+   │                         │                          │ verify JWT (RS256)       │
+   │                         │                          │─ POST /api/v1/logout ──→│
+   │                         │                          │  Authorization: Bearer  │
+   │                         │                          │  body:{refresh_token}   │
+   │                         │                          │←── 200 OK ──────────────│
+   │                         │←── 200 OK ───────────────│                         │
+   │                         │ Clear cả 2 cookies       │                         │
+   │←─ 200 OK ───────────────│                          │                         │
+   │ redirect /auth/login    │                          │                         │
 ```
 
 ### 3.5 Middleware protection
