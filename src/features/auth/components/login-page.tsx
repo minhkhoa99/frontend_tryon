@@ -1,24 +1,109 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Script from 'next/script'
 import { AuthShell } from '@/features/auth/components/auth-shell'
 import { useLoginForm } from '@/features/auth/hooks/use-auth-forms'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { getLoginContent } from '@/features/auth/services/auth-content.service'
 import type { LoginSchema } from '@/features/auth/schemas/auth.schema'
 
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID
+
 export function LoginPage() {
   const content = getLoginContent()
   const form = useLoginForm()
   const { register, handleSubmit, formState: { errors } } = form
-  const { login, isLoading, error } = useAuth()
+  const { login, loginWithOAuth, isLoading, error } = useAuth()
+  const [isGoogleSdkLoaded, setIsGoogleSdkLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !isGoogleSdkLoaded || !window.google?.accounts.oauth2) {
+      return
+    }
+
+    const tokenClient = window.google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: 'openid email profile',
+      callback: (response) => {
+        if (!response.access_token) {
+          return
+        }
+
+        void loginWithOAuth('google', response.access_token, 'access_token')
+      },
+      error_callback: () => {
+        // Provider SDK error is surfaced through the common auth error state.
+      },
+    })
+
+    window.__tryOnGoogleTokenClient = tokenClient
+  }, [isGoogleSdkLoaded, loginWithOAuth])
 
   const onSubmit = async (values: LoginSchema) => {
     await login(values.phone, values.password)
   }
 
+  const handleGoogleLogin = () => {
+    window.__tryOnGoogleTokenClient?.requestAccessToken()
+  }
+
+  const handleFacebookLogin = () => {
+    if (!window.FB) {
+      return
+    }
+
+    window.FB.login((response) => {
+      const accessToken = response.authResponse?.accessToken
+      if (!accessToken) {
+        return
+      }
+
+      void loginWithOAuth('facebook', accessToken, 'access_token')
+    }, { scope: 'public_profile,email' })
+  }
+
+  const handleSocialLogin = (providerId: string) => {
+    if (providerId === 'google') {
+      handleGoogleLogin()
+      return
+    }
+
+    if (providerId === 'facebook') {
+      handleFacebookLogin()
+    }
+  }
+
   return (
     <AuthShell content={content} activeTab="login">
+      {GOOGLE_CLIENT_ID ? (
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+          onLoad={() => setIsGoogleSdkLoaded(true)}
+        />
+      ) : null}
+      {FACEBOOK_APP_ID ? (
+        <Script
+          id="facebook-sdk"
+          src="https://connect.facebook.net/en_US/sdk.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            if (!window.FB || !FACEBOOK_APP_ID) {
+              return
+            }
+
+            window.FB.init({
+              appId: FACEBOOK_APP_ID,
+              cookie: false,
+              xfbml: false,
+              version: 'v22.0',
+            })
+          }}
+        />
+      ) : null}
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <h1 className="font-[family-name:var(--font-playfair)] text-[34px] font-bold text-[#FFF7F2]">
           {content.title}
@@ -32,6 +117,8 @@ export function LoginPage() {
               <button
                 key={provider.id}
                 type="button"
+                onClick={() => handleSocialLogin(provider.id)}
+                disabled={isLoading}
                 className="flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.08] bg-white/[0.05] text-[14px] font-medium text-[#E0D8D4]"
               >
                 <span className="text-white">{provider.icon}</span>

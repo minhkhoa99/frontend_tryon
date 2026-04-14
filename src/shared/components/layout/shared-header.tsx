@@ -1,11 +1,12 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { Bell, Menu, ShoppingBag, User } from "lucide-react";
+import { Bell, Menu, ShoppingBag, User, LogOut, UserCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { NavItem } from "@/features/home/types/home.types";
 import { SiteShell } from "@/shared/components/layout/site-shell";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 type SharedHeaderProps = {
   navItems: NavItem[];
@@ -22,6 +23,74 @@ const iconLinkClassName =
 
 const menuButtonClassName =
   "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.05] text-[#f4ece7] backdrop-blur-md transition hover:bg-white/[0.09] lg:hidden";
+
+function UserMenu() {
+  const { isLoggedIn, logout, isLoading } = useAuth();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  if (!isLoggedIn) {
+    return (
+      <Link href="/auth/login" className={iconLinkClassName} aria-label="Đăng nhập">
+        <User size={18} />
+      </Link>
+    );
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={iconLinkClassName}
+        aria-label="Tài khoản"
+      >
+        <UserCircle size={18} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+8px)] z-50 min-w-[160px] rounded-2xl border border-white/10 bg-[#14100e]/95 py-1 shadow-2xl backdrop-blur-xl">
+          <Link
+            href="/profile"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[#e0d8d4] transition hover:bg-white/[0.07]"
+          >
+            <UserCircle size={15} />
+            Hồ sơ của tôi
+          </Link>
+          <Link
+            href="/orders"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[#e0d8d4] transition hover:bg-white/[0.07]"
+          >
+            <ShoppingBag size={15} />
+            Đơn hàng
+          </Link>
+          <div className="my-1 h-px bg-white/10" />
+          <button
+            type="button"
+            disabled={isLoading}
+            onClick={() => { setOpen(false); void logout(); }}
+            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[13px] text-red-400 transition hover:bg-white/[0.07] disabled:opacity-50"
+          >
+            <LogOut size={15} />
+            Đăng xuất
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function SharedHeader({ navItems }: SharedHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,9 +126,7 @@ export function SharedHeader({ navItems }: SharedHeaderProps) {
             <Link href="/cart" className={iconLinkClassName} aria-label="Giỏ hàng của tôi">
               <ShoppingBag size={18} />
             </Link>
-            <Link href="/auth/login" className={iconLinkClassName} aria-label="Tài khoản và hỗ trợ">
-              <User size={18} />
-            </Link>
+            <UserMenu />
             <Link href="/try-on" className={headerCtaClassName}>
               Thử đồ AI
             </Link>
@@ -106,9 +173,7 @@ export function SharedHeader({ navItems }: SharedHeaderProps) {
               <Link href="/cart" className={iconLinkClassName} aria-label="Giỏ hàng của tôi">
                 <ShoppingBag size={18} />
               </Link>
-              <Link href="/auth/login" className={iconLinkClassName} aria-label="Tài khoản và hỗ trợ">
-                <User size={18} />
-              </Link>
+              <UserMenu />
             </div>
           </div>
         </nav>

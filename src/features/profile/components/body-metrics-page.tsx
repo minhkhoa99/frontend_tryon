@@ -39,8 +39,7 @@ export function BodyMetricsPage() {
     shouldReduceMotion === false
       ? ({
           initial: "hidden" as const,
-          whileInView: "visible" as const,
-          viewport: { once: true, amount: 0.2 },
+          animate: "visible" as const,
           variants: reveal,
           transition: { duration: 0.6, ease: "easeOut" as const },
         } as const)

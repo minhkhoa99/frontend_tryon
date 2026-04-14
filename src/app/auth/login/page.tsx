@@ -1,5 +1,10 @@
-import { LoginPage } from "@/features/auth/components/login-page";
+import { Suspense } from 'react'
+import { LoginPage } from '@/features/auth/components/login-page'
 
 export default function LoginRoute() {
-  return <LoginPage />;
+  return (
+    <Suspense>
+      <LoginPage />
+    </Suspense>
+  )
 }

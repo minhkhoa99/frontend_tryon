@@ -22,7 +22,7 @@ export function useLoginForm() {
 export function useRegisterForm() {
   return useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { fullName: '', phone: '', password: '', agree: true },
+    defaultValues: { fullName: '', phone: '', email: '', password: '', agree: true },
     mode: 'onBlur',
   })
 }

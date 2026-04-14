@@ -1,27 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { setAuthCookies } from '@/lib/auth/cookies'
+
 const GATEWAY_URL = process.env.GATEWAY_URL!
 
-interface GatewayLoginResponse {
+interface GatewayVerifyOtpResponse {
   code: number
   success: boolean
   message: string
   data: {
-    access_token: string
-    refresh_token: string
-    user_id: number
-    uuid: string
+    sign_key: string
+    uid: number
   } | null
 }
 
 export async function POST(req: NextRequest) {
   let phone: string
-  let password: string
+  let otp_code: string
+  let device_id: string
 
   try {
     const body = await req.json()
     phone = body.phone
-    password = body.password
+    otp_code = body.otpCode
+    device_id = body.deviceId ?? crypto.randomUUID()
   } catch {
     return NextResponse.json(
       { code: 400, success: false, message: 'invalid request body' },
@@ -29,29 +29,19 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  if (!phone || !password) {
+  if (!phone || !otp_code) {
     return NextResponse.json(
-      { code: 400, success: false, message: 'phone và password là bắt buộc' },
+      { code: 400, success: false, message: 'phone và otpCode là bắt buộc' },
       { status: 400 },
     )
   }
 
   let gatewayRes: Response
   try {
-    gatewayRes = await fetch(`${GATEWAY_URL}/api/v1/login`, {
+    gatewayRes = await fetch(`${GATEWAY_URL}/api/v1/verify_otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: phone,
-        password,
-        metadata: {
-          device_id: crypto.randomUUID(),
-          device_os: 'web',
-          device_name: 'Browser',
-          os_version: 'web',
-          app_version: '1.0.0',
-        },
-      }),
+      body: JSON.stringify({ phone, otp_code, device_id }),
     })
   } catch {
     return NextResponse.json(
@@ -60,7 +50,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const body: GatewayLoginResponse = await gatewayRes.json()
+  const body: GatewayVerifyOtpResponse = await gatewayRes.json()
 
   if (!gatewayRes.ok || !body.success || !body.data) {
     return NextResponse.json(
@@ -69,14 +59,16 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { access_token, refresh_token, user_id, uuid } = body.data
-
-  const res = NextResponse.json(
-    { code: 200, success: true, message: 'ok', data: { userId: user_id, uuid } },
+  return NextResponse.json(
+    {
+      code: 200,
+      success: true,
+      message: 'ok',
+      data: {
+        signKey: body.data.sign_key,
+        uid: body.data.uid,
+      },
+    },
     { status: 200 },
   )
-
-  setAuthCookies(res.cookies, access_token, refresh_token)
-
-  return res
 }
